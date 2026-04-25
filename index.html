@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bagdar AI - Your Personal Life Navigator</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --purple: #8b5cf6;
+            --blue: #3b82f6;
+            --gradient: linear-gradient(135deg, var(--purple), var(--blue));
+            --surface: rgba(255, 255, 255, 0.05);
+            --surface-hover: rgba(255, 255, 255, 0.1);
+            --border: rgba(255,255,255,0.1);
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font);
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            outline: none;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+        .lang-switcher:hover {
+            border-color: var(--purple);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography & Common */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        h2 { font-size: 2rem; margin-bottom: 20px; }
+        p { color: var(--text-muted); line-height: 1.6; text-align: center; margin-bottom: 30px; }
+        
+        button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: white;
+            border-radius: 8px;
+            outline: none;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.2);
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--surface);
+            border-top: 4px solid var(--purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Form Container */
+        .form-container {
+            background: var(--surface);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Screen 3 - Smart Questions */
+        #progress-container {
+            width: 100%;
+            max-width: 600px;
+            height: 6px;
+            background: var(--surface);
+            border-radius: 3px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            position: absolute;
+            top: 20px;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--gradient);
+            transition: width 0.5s ease;
+        }
+        .typewriter-text {
+            font-size: 1.5rem;
+            min-height: 80px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-right: 2px solid var(--purple);
+            white-space: pre-wrap;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { border-color: transparent; } }
+        .answer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .answer-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: white;
+            box-shadow: none;
+        }
+        .answer-btn:hover { background: var(--surface-hover); border-color: var(--blue); }
+
+        /* Dashboard */
+        .dash-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .dash-nav {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .dash-nav::-webkit-scrollbar { height: 4px; }
+        .dash-nav::-webkit-scrollbar-thumb { background: var(--surface); border-radius: 4px; }
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            box-shadow: none;
+            padding: 10px 15px;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            color: white;
+            border-bottom: 2px solid var(--purple);
+            border-radius: 8px 8px 0 0;
+            background: var(--surface);
+        }
+        .tab-content { display: none; animation: fadeIn 0.4s; }
+        .tab-content.active { display: block; }
+
+        /* Cards Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--purple);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--gradient);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .card h3 { margin-bottom: 10px; color: var(--text-main); font-size: 1.2rem; }
+        .card p { color: var(--text-muted); text-align: left; margin-bottom: 10px; font-size: 0.9rem; }
+        .card a { color: var(--blue); text-decoration: none; font-size: 0.9rem; margin-top: auto; display: inline-block; }
+        .card a:hover { text-decoration: underline; }
+
+        /* specific layout utilities */
+        .tag { background: var(--surface-hover); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; margin-right: 5px; display: inline-block; margin-bottom: 5px; }
+
+        /* AI Chat */
+        .chat-container { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; height: 600px; display: flex; flex-direction: column; overflow: hidden; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .chat-bubble { max-width: 80%; padding: 12px 16px; border-radius: 16px; font-size: 0.95rem; line-height: 1.4; animation: fadeIn 0.3s; }
+        .chat-bot { background: rgba(139, 92, 246, 0.1); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(139, 92, 246, 0.2); }
+        .chat-user { background: var(--surface-hover); align-self: flex-end; border-bottom-right-radius: 4px; }
+        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid var(--border); background: var(--bg-color); }
+        .chat-input-area input { margin-bottom: 0; border-radius: 8px 0 0 8px; border-right: none; }
+        .chat-input-area button { border-radius: 0 8px 8px 0; }
+        .chips-container { display: flex; flex-wrap: wrap; gap: 8px; padding: 15px; border-top: 1px solid var(--border); }
+        .chip { background: var(--surface); border: 1px solid var(--border); padding: 6px 12px; border-radius: 16px; font-size: 0.8rem; cursor: pointer; color: var(--text-main); }
+        .chip:hover { border-color: var(--blue); background: var(--surface-hover); }
+
+        /* Tools filters */
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filters input, .filters select { margin-bottom: 0; width: auto; flex: 1; min-width: 150px; }
+
+        .hidden { display: none !important; }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .dash-container { padding-top: 50px; }
+            .grid { grid-template-columns: 1fr; }
+            #progress-container { width: 90%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Language Selector -->
+    <select id="langSwitcher" class="lang-switcher" onchange="changeLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="ru">Русский</option>
+        <option value="kk">Қазақша</option>
+    </select>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <h2 style="background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Bagdar AI</h2>
+        <p id="t-loading">Initializing Navigator...</p>
+    </div>
+
+    <!-- Screen 1: Welcome -->
+    <div id="screen-1" class="screen">
+        <div style="text-align: center; max-width: 600px;">
+            <div style="font-size: 5rem; margin-bottom: 20px;">🧭</div>
+            <h1>Bagdar AI</h1>
+            <h2 style="color: var(--text-muted); font-weight: normal; font-size: 1.5rem;" id="t-subtitle">Your Personal Life Navigator</h2>
+            <br>
+            <button onclick="nav('screen-2')" id="t-start-btn">Start My Journey</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Personal Info -->
+    <div id="screen-2" class="screen">
+        <div class="form-container">
+            <h2 id="t-personal-info" style="text-align:center;">Tell us about yourself</h2>
+            <input type="text" id="pi-name" placeholder="Full Name" required>
+            <input type="number" id="pi-age" placeholder="Age" required>
+            <select id="pi-grade">
+                <option value="" disabled selected id="t-grade-ph">Select Grade/Status</option>
+                <option value="1-4">Grades 1-4</option>
+                <option value="5-6">Grades 5-6</option>
+                <option value="7-8">Grades 7-8</option>
+                <option value="9">Grade 9</option>
+                <option value="10-11">Grades 10-11</option>
+                <option value="University">University</option>
+                <option value="Adult">Adult / Pro</option>
+            </select>
+            <select id="pi-country">
+                <option value="" disabled selected id="t-country-ph">Select Country</option>
+                <!-- Populated via JS -->
+            </select>
+            <input type="text" id="pi-city" placeholder="City" required>
+            <button onclick="submitPersonalInfo()" style="width:100%;" id="t-continue-btn">Continue</button>
+        </div>
+    </div>
+
+    <!-- Screen 3: Smart Questions -->
+    <div id="screen-3" class="screen" style="position:relative;">
+        <div id="progress-container"><div id="progress-bar"></div></div>
+        <div style="width:100%; max-width: 600px; display:flex; flex-direction:column; align-items:center;">
+            <div id="sq-question" class="typewriter-text"></div>
+            <div id="sq-answers" class="answer-grid">
+                <!-- Dynamically populated answer buttons -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 4: Dashboard -->
+    <div id="screen-4" class="screen" style="justify-content: flex-start; padding-top: 60px;">
+        <div class="dash-container">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <h2 style="margin:0;"><span id="dash-greeting">Hello</span> <span style="color:var(--blue)">👋</span></h2>
+                <button onclick="resetApp()" style="padding: 8px 16px; font-size:0.9rem;" id="t-reset">Reset Data</button>
+            </div>
+
+            <div class="dash-nav" id="dash-tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('tab-path')">🎯 <span id="t-tab-path">My Path</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-uni')">🏫 <span id="t-tab-uni">Universities</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-scholar')">💰 <span id="t-tab-scholar">Scholarships</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-exams')">📝 <span id="t-tab-exams">Exam Prep</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-intern')">💼 <span id="t-tab-intern">Internships</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-chat')">💬 <span id="t-tab-chat">AI Chat</span></button>
+                <button class="tab-btn" onclick="switchTab('tab-portfolio')">📄 <span id="t-tab-portfolio">Portfolio</span></button>
+            </div>
+
+            <!-- Tab 1: My Path -->
+            <div id="tab-path" class="tab-content active">
+                <h3 id="t-path-matches" style="margin-bottom:15px;">Your Top Career Matches</h3>
+                <div id="path-careers" class="grid" style="margin-bottom:40px;"></div>
+                
+                <h3 id="t-path-action" style="margin-bottom:15px; margin-top:20px;">Your Action Plan</h3>
+                <div class="card" id="path-action-plan"></div>
+            </div>
+
+            <!-- Tab 2: Universities -->
+            <div id="tab-uni" class="tab-content">
+                <div class="filters">
+                    <input type="text" id="filter-uni-search" placeholder="Search univesities..." oninput="renderUniversities()">
+                    <select id="filter-uni-country" onchange="renderUniversities()">
+                        <option value="">All Countries</option>
+                    </select>
+                </div>
+                <div id="uni-grid" class="grid"></div>
+            </div>
+
+            <!-- Tab 3: Scholarships -->
+            <div id="tab-scholar" class="tab-content">
+                <div class="filters">
+                    <input type="text" id="filter-schol-search" placeholder="Search scholarships..." oninput="renderScholarships()">
+                </div>
+                <div id="schol-grid" class="grid"></div>
+            </div>
+
+            <!-- Tab 4: Exam Prep -->
+            <div id="tab-exams" class="tab-content">
+                <div class="grid" id="exams-grid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Tab 5: Internships -->
+            <div id="tab-intern" class="tab-content">
+                <div style="display:flex; gap:20px; flex-wrap:wrap;">
+                    <!-- Platforms -->
+                    <div style="flex:1; min-width:300px;">
+                        <h3 id="t-intern-links" style="margin-bottom:15px;">Top Internship Platforms</h3>
+                        <div id="intern-links" style="display:flex; flex-direction:column; gap:10px;"></div>
+                    </div>
+                    <!-- Builders -->
+                    <div style="flex:1; min-width:300px; display:flex; flex-direction:column; gap:20px;">
+                        <div class="card">
+                            <h3 id="t-cv-build">CV Builder</h3>
+                            <input type="text" id="cv-edu" placeholder="Education">
+                            <input type="text" id="cv-skills" placeholder="Skills (comma separated)">
+                            <button onclick="generateItem('cv')">Generate CV</button>
+                        </div>
+                        <div class="card">
+                            <h3 id="t-cl-build">Cover Letter Generator</h3>
+                            <input type="text" id="cl-role" placeholder="Target Role">
+                            <input type="text" id="cl-comp" placeholder="Company Name">
+                            <button onclick="generateItem('cl')">Generate Letter</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="generated-outputs" style="margin-top:20px;"></div>
+            </div>
+
+            <!-- Tab 6: AI Chat -->
+            <div id="tab-chat" class="tab-content">
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-bubble chat-bot" id="t-chat-greeting">Hi! I'm Bagdar AI. Ask me anything about universities, scholarships, careers, IELTS, internships, or your future!</div>
+                    </div>
+                    <div class="chips-container" id="chat-chips">
+                        <div class="chip" onclick="sendChatFromChip('How do I get into MIT?')">How do I get into MIT?</div>
+                        <div class="chip" onclick="sendChatFromChip('What is Chevening scholarship?')">What is Chevening scholarship?</div>
+                        <div class="chip" onclick="sendChatFromChip('How to prepare for IELTS?')">How to prepare for IELTS?</div>
+                        <div class="chip" onclick="sendChatFromChip('What are the best careers in 2030?')">Best careers in 2030?</div>
+                        <div class="chip" onclick="sendChatFromChip('Write me a motivation letter')">Write motivation letter</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="Type your message..." onkeypress="handleChatPress(event)">
+                        <button onclick="sendChat()">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 7: Portfolio -->
+            <div id="tab-portfolio" class="tab-content">
+                <div class="form-container" style="max-width:800px; margin:0 auto;" id="portfolio-form">
+                    <h2 id="t-port-gen">Generate Your Portfolio</h2>
+                    <input type="text" id="pf-school" placeholder="School / University">
+                    <input type="text" id="pf-achive" placeholder="Key Achievements (comma separated)">
+                    <input type="text" id="pf-lang" placeholder="Languages Spoken">
+                    <textarea id="pf-projects" rows="4" placeholder="Projects or Volunteering"></textarea>
+                    <input type="text" id="pf-goal" placeholder="Main Career Goal">
+                    <button onclick="generatePortfolio()" id="t-btn-gen-port">Generate Portfolio Card</button>
+                </div>
+                <div id="portfolio-output" style="margin-top:30px;"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- DATA OBJECTS: 100% OFFLINE ZERO DEPENDENCY ---
+
+        const careersData = [
+            { id: 1,  title: "Software Engineer", desc: "Design and build applications and systems.", salary: "$120,000", demand: "⭐⭐⭐⭐⭐", skills: "Coding, Logic, Math" },
+            { id: 2,  title: "Data Scientist", desc: "Analyze data to extract insights.", salary: "$130,000", demand: "⭐⭐⭐⭐⭐", skills: "Python, Stats, ML" },
+            { id: 3,  title: "Product Manager", desc: "Guide product lifecycle and strategy.", salary: "$140,000", demand: "⭐⭐⭐⭐", skills: "Leadership, Agile, UI/UX" },
+            { id: 4,  title: "Investment Banker", desc: "Raise capital and advise corporations.", salary: "$150,000+", demand: "⭐⭐⭐", skills: "Finance, Excel, Analysis" },
+            { id: 5,  title: "Management Consultant", desc: "Solve complex business problems.", salary: "$130,000", demand: "⭐⭐⭐⭐", skills: "Strategy, Communication" },
+            { id: 6,  title: "Physician", desc: "Diagnose and treat medical conditions.", salary: "$200,000+", demand: "⭐⭐⭐⭐⭐", skills: "Biology, Empathy, Focus" },
+            { id: 7,  title: "UI/UX Designer", desc: "Design user-friendly digital interfaces.", salary: "$100,000", demand: "⭐⭐⭐⭐", skills: "Figma, Empathy, Design" },
+            { id: 8,  title: "Marketing Manager", desc: "Plan marketing campaigns and brands.", salary: "$110,000", demand: "⭐⭐⭐⭐", skills: "SEO, Creativity, Data" },
+            { id: 9,  title: "Architect", desc: "Design buildings and structures.", salary: "$90,000", demand: "⭐⭐⭐", skills: "CAD, Design, Physics" },
+            { id: 10, title: "Cybersecurity Analyst", desc: "Protect systems from cyber threats.", salary: "$115,000", demand: "⭐⭐⭐⭐⭐", skills: "Networking, Security, Python" },
+            { id: 11, title: "Biomedical Engineer", desc: "Combine engineering with medical science.", salary: "$95,000", demand: "⭐⭐⭐⭐", skills: "Biology, Engineering" },
+            { id: 12, title: "Aerospace Engineer", desc: "Design aircraft and spacecraft.", salary: "$120,000", demand: "⭐⭐⭐", skills: "Physics, Math, CAD" },
+            { id: 13, title: "Environmental Scientist", desc: "Protect the environment and health.", salary: "$80,000", demand: "⭐⭐⭐⭐", skills: "Ecology, Data, Research" },
+            { id: 14, title: "Financial Analyst", desc: "Guide businesses on financial decisions.", salary: "$95,000", demand: "⭐⭐⭐⭐", skills: "Accounting, Excel" },
+            { id: 15, title: "AI Researcher", desc: "Advance the field of Artificial Intelligence.", salary: "$160,000", demand: "⭐⭐⭐⭐⭐", skills: "Math, Python, Deep Learning" },
+            { id: 16, title: "Content Creator", desc: "Produce media for online platforms.", salary: "Variable", demand: "⭐⭐⭐⭐", skills: "Video, Writing, Social Media" },
+            { id: 17, title: "HR Manager", desc: "Manage employee relations and hiring.", salary: "$100,000", demand: "⭐⭐⭐", skills: "Communication, Empathy" },
+            { id: 18, title: "Supply Chain Manager", desc: "Oversee logistics and product movement.", salary: "$110,000", demand: "⭐⭐⭐⭐", skills: "Logistics, Negotiation" },
+            { id: 19, title: "Graphic Designer", desc: "Create visual concepts and art.", salary: "$60,000", demand: "⭐⭐⭐", skills: "Adobe, Creativity" },
+            { id: 20, title: "Civil Engineer", desc: "Design infrastructure projects.", salary: "$90,000", demand: "⭐⭐⭐⭐", skills: "Math, Project Management" }
+        ];
+
+        const universitiesData = [
+            { n: "MIT", c: "USA", r: 1, t: "$57k", a: "4%", p: "Engineering, CS", d: "Jan 1", u: "https://mit.edu" },
+            { n: "Harvard University", c: "USA", r: 4, t: "$54k", a: "3%", p: "Law, Business", d: "Jan 1", u: "https://harvard.edu" },
+            { n: "Stanford University", c: "USA", r: 3, t: "$56k", a: "4%", p: "CS, Business", d: "Jan 5", u: "https://stanford.edu" },
+            { n: "UCLA", c: "USA", r: 29, t: "$43k", a: "9%", p: "Arts, Engineering", d: "Nov 30", u: "https://ucla.edu" },
+            { n: "Caltech", c: "USA", r: 6, t: "$60k", a: "4%", p: "Physics, Engineering", d: "Jan 3", u: "https://caltech.edu" },
+            { n: "Yale University", c: "USA", r: 16, t: "$62k", a: "5%", p: "Law, History", d: "Jan 2", u: "https://yale.edu" },
+            { n: "Princeton University", c: "USA", r: 16, t: "$57k", a: "4%", p: "Math, Economics", d: "Jan 1", u: "https://princeton.edu" },
+            { n: "Columbia University", c: "USA", r: 23, t: "$65k", a: "4%", p: "Journalism, Finance", d: "Jan 1", u: "https://columbia.edu" },
+            { n: "Cornell University", c: "USA", r: 13, t: "$62k", a: "7%", p: "Engineering, Agri", d: "Jan 2", u: "https://cornell.edu" },
+            { n: "UC Berkeley", c: "USA", r: 10, t: "$44k", a: "11%", p: "CS, Engineering", d: "Nov 30", u: "https://berkeley.edu" },
+            
+            { n: "University of Oxford", c: "UK", r: 3, t: "£35k", a: "14%", p: "Humanities, Med", d: "Oct 15", u: "https://ox.ac.uk" },
+            { n: "University of Cambridge", c: "UK", r: 2, t: "£36k", a: "16%", p: "Science, Math", d: "Oct 15", u: "https://cam.ac.uk" },
+            { n: "Imperial College London", c: "UK", r: 6, t: "£38k", a: "11%", p: "Engineering, Med", d: "Jan 31", u: "https://imperial.ac.uk" },
+            { n: "UCL", c: "UK", r: 9, t: "£32k", a: "12%", p: "Architecture, Ed", d: "Jan 31", u: "https://ucl.ac.uk" },
+            { n: "LSE", c: "UK", r: 45, t: "£26k", a: "9%", p: "Economics, Social", d: "Jan 31", u: "https://lse.ac.uk" },
+            { n: "University of Edinburgh", c: "UK", r: 22, t: "£30k", a: "10%", p: "CS, Humanities", d: "Jan 31", u: "https://ed.ac.uk" },
+            { n: "King's College London", c: "UK", r: 40, t: "£28k", a: "13%", p: "Nursing, Law", d: "Jan 31", u: "https://kcl.ac.uk" },
+            { n: "University of Manchester", c: "UK", r: 32, t: "£27k", a: "15%", p: "Engineering, Biz", d: "Jan 31", u: "https://manchester.ac.uk" },
+            { n: "University of Warwick", c: "UK", r: 67, t: "£26k", a: "14%", p: "Math, Biz", d: "Jan 31", u: "https://warwick.ac.uk" },
+            { n: "University of Bristol", c: "UK", r: 55, t: "£27k", a: "20%", p: "Sci, Engineering", d: "Jan 31", u: "https://bristol.ac.uk" },
+
+            { n: "TU Munich", c: "Germany", r: 37, t: "€3k", a: "8%", p: "Engineering, Tech", d: "May 31", u: "https://tum.de" },
+            { n: "Heidelberg University", c: "Germany", r: 87, t: "€3k", a: "16%", p: "Med, Sci", d: "Jul 15", u: "https://heidelberg.de" },
+            { n: "LMU Munich", c: "Germany", r: 54, t: "€0", a: "10%", p: "Physics, Biol", d: "Jul 15", u: "https://lmu.de" },
+            { n: "RWTH Aachen", c: "Germany", r: 106, t: "€0", a: "20%", p: "Engineering", d: "Jul 15", u: "https://rwth-aachen.de" },
+            { n: "Humboldt University", c: "Germany", r: 120, t: "€0", a: "18%", p: "Arts, Hum", d: "Jul 15", u: "https://hu-berlin.de" },
+
+            { n: "University of Toronto", c: "Canada", r: 21, t: "$60k", a: "43%", p: "CS, Med", d: "Jan 15", u: "https://utoronto.ca" },
+            { n: "UBC", c: "Canada", r: 34, t: "$45k", a: "52%", p: "Ecology, Biz", d: "Jan 15", u: "https://ubc.ca" },
+            { n: "McGill University", c: "Canada", r: 30, t: "$50k", a: "38%", p: "Med, Law", d: "Jan 15", u: "https://mcgill.ca" },
+            { n: "McMaster University", c: "Canada", r: 189, t: "$40k", a: "58%", p: "Health, Eng", d: "Jan 15", u: "https://mcmaster.ca" },
+            { n: "University of Waterloo", c: "Canada", r: 112, t: "$45k", a: "53%", p: "Math, CS", d: "Feb 1", u: "https://uwaterloo.ca" },
+
+            { n: "ANU", c: "Australia", r: 34, t: "$45k", a: "35%", p: "Politics, Law", d: "Dec 15", u: "https://anu.edu.au" },
+            { n: "University of Melbourne", c: "Australia", r: 14, t: "$48k", a: "30%", p: "Med, Arts", d: "Dec 20", u: "https://unimelb.edu.au" },
+            { n: "University of Sydney", c: "Australia", r: 19, t: "$46k", a: "30%", p: "Vet, Arch", d: "Jan 15", u: "https://sydney.edu.au" },
+            { n: "UNSW", c: "Australia", r: 19, t: "$45k", a: "35%", p: "Eng, Fin", d: "Nov 30", u: "https://unsw.edu.au" },
+            { n: "Monash University", c: "Australia", r: 42, t: "$44k", a: "40%", p: "Pharm, Educ", d: "Jan 10", u: "https://monash.edu" },
+
+            { n: "Delft University (TU Delft)", c: "Netherlands", r: 47, t: "€16k", a: "15%", p: "Architecture, Eng", d: "Jan 15", u: "https://tudelft.nl" },
+            { n: "University of Amsterdam", c: "Netherlands", r: 53, t: "€12k", a: "20%", p: "Comm, Media", d: "Jan 15", u: "https://uva.nl" },
+            { n: "Wageningen University", c: "Netherlands", r: 151, t: "€10k", a: "30%", p: "Agri, Forestry", d: "May 1", u: "https://wur.nl" },
+
+            { n: "Nazarbayev University", c: "Kazakhstan", r: 400, t: "Free(Grant)", a: "10%", p: "Eng, CS", d: "Mar 30", u: "https://nu.edu.kz" },
+            { n: "KBTU", c: "Kazakhstan", r: 800, t: "$4k", a: "30%", p: "CS, Oil", d: "Aug 15", u: "https://kbtu.edu.kz" },
+            { n: "SDU", c: "Kazakhstan", r: 1000, t: "$3k", a: "40%", p: "Law, IT", d: "Aug 10", u: "https://sdu.edu.kz" },
+            { n: "KIMEP", c: "Kazakhstan", r: 900, t: "$5k", a: "35%", p: "Biz, Fin", d: "Jul 15", u: "https://kimep.kz" },
+            { n: "Al-Farabi KazNU", c: "Kazakhstan", r: 230, t: "$3k", a: "40%", p: "Sci, Hum", d: "Aug 10", u: "https://kaznu.kz" },
+
+            { n: "NUS", c: "Singapore", r: 8, t: "$25k", a: "5%", p: "Eng, CS", d: "Feb 28", u: "https://nus.edu.sg" },
+            { n: "NTU", c: "Singapore", r: 26, t: "$23k", a: "10%", p: "Materials Sci, Eng", d: "Jan 15", u: "https://ntu.edu.sg" },
+
+            { n: "MBZUAI", c: "UAE", r: 500, t: "Funded", a: "4%", p: "AI, ML", d: "Feb 28", u: "https://mbzuai.ac.ae" },
+            { n: "Khalifa University", c: "UAE", r: 230, t: "$20k", a: "15%", p: "Eng", d: "May 1", u: "https://ku.ac.ae" },
+
+            { n: "Tokyo University (UTokyo)", c: "Japan", r: 28, t: "$5k", a: "10%", p: "Sci, Tech", d: "Dec 15", u: "https://u-tokyo.ac.jp" },
+            { n: "Kyoto University", c: "Japan", r: 46, t: "$5k", a: "12%", p: "Chem, Bio", d: "Dec 10", u: "https://kyoto-u.ac.jp" },
+            { n: "Tokyo Tech", c: "Japan", r: 91, t: "$5k", a: "15%", p: "Eng, IT", d: "Oct 15", u: "https://titech.ac.jp" },
+        ];
+
+        const scholarshipsData = [
+            { n: "Chevening", c: "UK", l: "Master", d: "Full funding, tuition, flights, stipend.", k: "Nov", u: "https://chevening.org" },
+            { n: "Fulbright", c: "USA", l: "Master/PhD", d: "Full funding + visa sponsorship.", k: "Varies", u: "https://fulbrightprogram.org" },
+            { n: "DAAD", c: "Germany", l: "All", d: "Full funding, living allowance.", k: "Varies", u: "https://daad.de" },
+            { n: "Болашак (Bolashak)", c: "World", l: "Master/PhD", d: "Full funding condition: return to KZ for 3-5 yrs.", k: "Aug", u: "https://bolashak.gov.kz" },
+            { n: "Erasmus+", c: "Europe", l: "Master", d: "Full funding joint European degrees.", k: "Jan", u: "https://erasmus-plus.ec.europa.eu" },
+            { n: "Gates Cambridge", c: "UK", l: "Master/PhD", d: "Full funding for Cambridge Univ.", k: "Dec", u: "https://gatescambridge.org" },
+            { n: "Rhodes Scholarship", c: "UK", l: "Master", d: "Full funding for Oxford Univ.", k: "Oct", u: "https://rhodeshouse.ox.ac.uk" },
+            { n: "Holland Scholarship", c: "Netherlands", l: "Bachelor/Master", d: "Partial (€5,000) for first year.", k: "Feb/May", u: "https://studyinnl.org" },
+            { n: "Stipendium Hungaricum", c: "Hungary", l: "All", d: "Full tuition, stipend, housing.", k: "Jan", u: "https://stipendiumhungaricum.hu" },
+            { n: "Australia Awards", c: "Australia", l: "All", d: "Full tuition, travel, living.", k: "April", u: "https://dfat.gov.au" },
+            { n: "Aga Khan Foundation", c: "World", l: "Master/PhD", d: "50% grant / 50% loan.", k: "March", u: "https://akdn.org" },
+            { n: "Türkiye Scholarships", c: "Turkey", l: "All", d: "Full funding, lang course.", k: "Feb", u: "https://turkiyeburslari.gov.tr" },
+            { n: "Chinese Government (CSC)", c: "China", l: "All", d: "Full tuition, housing, stipend.", k: "March", u: "https://campuschina.org" },
+            { n: "Global Korea (GKS)", c: "Korea", l: "All", d: "Full funding + lang yr.", k: "Feb", u: "https://studyinkorea.go.kr" },
+            { n: "MEXT Scholarship", c: "Japan", l: "All", d: "Full tuition, flights, stipend.", k: "May", u: "https://mext.go.jp" }
+        ];
+
+        const examsData = [
+            { t: "IELTS Guide", b: "Band 7.0+ for top univesities. 12-week study plan.", l: ["British Council", "IELTS Liz", "E2 IELTS"] },
+            { t: "SAT Guide", b: "1450+ for US top 50. 3-month math/english plan.", l: ["Khan Academy", "College Board"] },
+            { t: "NUET (Nazarbayev Univ)", b: "Math & Critical thinking. Above 120 score.", l: ["NU Official website"] },
+            { t: "NIS/BIL Entrance", b: "Kazakhstan advanced logic/math prep. 6 month plan.", l: ["NIS.edu.kz"] }
+        ];
+
+        const internshipsLinks = [
+            { n: "LinkedIn Jobs", u: "https://linkedin.com/jobs" },
+            { n: "Glassdoor", u: "https://glassdoor.com" },
+            { n: "Internshala", u: "https://internshala.com" },
+            { n: "Google Students", u: "https://careers.google.com/students" },
+            { n: "Microsoft Ambassadors", u: "https://studentambassadors.microsoft.com" },
+            { n: "NASA Internships", u: "https://intern.nasa.gov" },
+            { n: "UN Volunteers", u: "https://unv.org" },
+            { n: "Apple Internships", u: "https://apple.com/jobs" }
+        ];
+
+        let state = { lang: 'en', user: null, questions: [], qIndex: 0, answers: [] };
+
+        const questionsPool = {
+            "1-4": [
+                { q: "What is your favorite activity?", a: ["Drawing", "Building", "Sports", "Reading"] },
+                { q: "What is your favorite subject?", a: ["Math", "Art", "PE", "Science"] }
+            ],
+            "5-6": [
+                { q: "What subjects do you enjoy?", a: ["Math", "Literature", "Science", "History"] },
+                { q: "What do you do after school?", a: ["Gaming", "Sports", "Clubs", "Reading"] }
+            ],
+            "7-8": [
+                { q: "What are you naturally good at?", a: ["Logic", "Creativity", "Talking", "Building"] },
+                { q: "What problems do you want to solve?", a: ["Climate", "Tech", "Health", "Education"] }
+            ],
+            "9": [
+                { q: "Which direction interests you more?", a: ["Science", "Humanities", "Arts", "Technology", "Business"] },
+                { q: "How do you prefer to work?", a: ["Solo", "In a team", "Leading", "Following instructions"] }
+            ],
+            "10-11": [
+                { q: "What is your dream university location?", a: ["USA", "UK/Europe", "Asia", "Local"] },
+                { q: "What is your current IELTS/SAT status?", a: ["Done", "Preparing", "Not started"] },
+                { q: "What career excites you most?", a: ["Tech", "Medicine", "Business", "Arts"] },
+                { q: "What is your budget?", a: ["Full Grant", "Partial", "Self-funded"] }
+            ],
+            "University": [
+                { q: "What is your current field?", a: ["STEM", "Business", "Arts", "Social"] },
+                { q: "What are your career goals?", a: ["Corporate", "Startup", "Academia", "Freelance"] },
+                { q: "What skills do you want to develop?", a: ["Tech", "Soft skills", "Management", "Languages"] }
+            ],
+            "Adult": [
+                { q: "What are you looking for?", a: ["Career Change", "Masters/PhD", "Promotion", "New Skills"] },
+                { q: "Preferred mode?", a: ["Online", "In-person", "Hybrid"] }
+            ]
+        };
+
+        const i18n = {
+            en: {
+                loading: "Initializing Navigator...", subt: "Your Personal Life Navigator",
+                start: "Start My Journey", pinfo: "Tell us about yourself",
+                gradePh: "Select Grade/Status", countryPh: "Select Country", cont: "Continue",
+                reset: "Reset Data", tpath: "My Path", tuni: "Universities",
+                tscholar: "Scholarships", texams: "Exam Prep", tintern: "Internships",
+                tchat: "AI Chat", tport: "Portfolio", hello: "Hello",
+                pathMatches: "Your Top Career Matches", pathAction: "Your Action Plan",
+                internLinks: "Top Internship Platforms", cvBuild: "CV Builder", clBuild: "Cover Letter Generator",
+                portGen: "Generate Your Portfolio", btnPort: "Generate Portfolio Card",
+                chatGr: "Hi! I'm Bagdar AI. Ask me anything about universities, scholarships, careers, IELTS, internships, or your future!"
+            },
+            ru: {
+                loading: "Навигатор загружается...", subt: "Ваш личный навигатор по жизни",
+                start: "Начать путь", pinfo: "Расскажите о себе",
+                gradePh: "Выберите класс/статус", countryPh: "Выберите страну", cont: "Продолжить",
+                reset: "Сбросить", tpath: "Мой путь", tuni: "Университеты",
+                tscholar: "Стипендии", texams: "Экзамены", tintern: "Стажировки",
+                tchat: "ИИ Чат", tport: "Портфолио", hello: "Привет",
+                pathMatches: "Лучшие профессии для вас", pathAction: "Ваш план действий",
+                internLinks: "Основые платформы", cvBuild: "Создать резюме", clBuild: "Создать письмо",
+                portGen: "Создать портфолио", btnPort: "Сгенерировать карту",
+                chatGr: "Привет! Я Bagdar AI. Спрашивай о вузах, грантах, профессиях, IELTS, стажировках или своем будущем!"
+            },
+            kk: {
+                loading: "Навигатор іске қосылуда...", subt: "Сенің жеке өмірлік навигаторың",
+                start: "Жолды бастау", pinfo: "Өзің туралы айт",
+                gradePh: "Сыныпты таңдаңыз", countryPh: "Елді таңдаңыз", cont: "Жалғастыру",
+                reset: "Деректерді жою", tpath: "Менің жолым", tuni: "Университеттер",
+                tscholar: "Стипендиялар", texams: "Емтихандар", tintern: "Тағылымдамалар",
+                tchat: "ЖИ Чат", tport: "Портфолио", hello: "Сәлем",
+                pathMatches: "Сізге арналған мамандықтар", pathAction: "Сіздің іс-қимыл жоспарыңыз",
+                internLinks: "Негізгі платформалар", cvBuild: "Түйіндеме жасау", clBuild: "Хат жасау",
+                portGen: "Портфолио жасау", btnPort: "Картаны генерациялау",
+                chatGr: "Сәлем! Мен Bagdar AI. Университеттер, стипендиялар, IELTS, тағылымдамалар немесе болашағың туралы сұра!"
+            }
+        };
+
+        // --- CORE LOGIC ---
+
+        window.onload = () => {
+            const saved = localStorage.getItem('bagdar_user');
+            populateCountries();
+            if (saved) {
+                state.user = JSON.parse(saved);
+                document.getElementById('dash-greeting').innerText = state.user.name;
+                initDashboard();
+                setTimeout(() => { document.getElementById('loading-screen').style.display='none'; nav('screen-4'); }, 1500);
+            } else {
+                setTimeout(() => { document.getElementById('loading-screen').style.display='none'; nav('screen-1'); }, 1500);
+            }
+        };
+
+        function nav(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function changeLanguage(l) {
+            state.lang = l;
+            document.getElementById('t-loading').innerText = i18n[l].loading;
+            document.getElementById('t-subtitle').innerText = i18n[l].subt;
+            document.getElementById('t-start-btn').innerText = i18n[l].start;
+            document.getElementById('t-personal-info').innerText = i18n[l].pinfo;
+            document.getElementById('t-grade-ph').innerText = i18n[l].gradePh;
+            document.getElementById('t-country-ph').innerText = i18n[l].countryPh;
+            document.getElementById('t-continue-btn').innerText = i18n[l].cont;
+            document.getElementById('t-reset').innerText = i18n[l].reset;
+            document.getElementById('t-tab-path').innerText = i18n[l].tpath;
+            document.getElementById('t-tab-uni').innerText = i18n[l].tuni;
+            document.getElementById('t-tab-scholar').innerText = i18n[l].tscholar;
+            document.getElementById('t-tab-exams').innerText = i18n[l].texams;
+            document.getElementById('t-tab-intern').innerText = i18n[l].tintern;
+            document.getElementById('t-tab-chat').innerText = i18n[l].tchat;
+            document.getElementById('t-tab-portfolio').innerText = i18n[l].tport;
+            document.getElementById('dash-greeting').previousElementSibling.innerText = i18n[l].hello;
+            document.getElementById('t-path-matches').innerText = i18n[l].pathMatches;
+            document.getElementById('t-path-action').innerText = i18n[l].pathAction;
+            document.getElementById('t-intern-links').innerText = i18n[l].internLinks;
+            document.getElementById('t-cv-build').innerText = i18n[l].cvBuild;
+            document.getElementById('t-cl-build').innerText = i18n[l].clBuild;
+            document.getElementById('t-port-gen').innerText = i18n[l].portGen;
+            document.getElementById('t-btn-gen-port').innerText = i18n[l].btnPort;
+            document.getElementById('t-chat-greeting').innerText = i18n[l].chatGr;
+        }
+
+        const cList = ["Afghanistan", "Australia", "Brazil", "Canada", "China", "France", "Germany", "India", "Japan", "Kazakhstan", "Netherlands", "Russia", "Singapore", "South Korea", "Turkey", "UAE", "UK", "USA"];
+        function populateCountries() {
+            let sel = document.getElementById('pi-country');
+            let uf = document.getElementById('filter-uni-country');
+            cList.forEach(c => {
+                sel.innerHTML += `<option value="${c}">${c}</option>`;
+            });
+            let uniCountries = [...new Set(universitiesData.map(u => u.c))].sort();
+            uniCountries.forEach(c => { uf.innerHTML += `<option value="${c}">${c}</option>`; });
+        }
+
+        function submitPersonalInfo() {
+            const name = document.getElementById('pi-name').value;
+            const age = document.getElementById('pi-age').value;
+            const grade = document.getElementById('pi-grade').value;
+            const country = document.getElementById('pi-country').value;
+            const city = document.getElementById('pi-city').value;
+            
+            if(!name || !age || !grade || !country || !city) return alert("Please fill all fields");
+
+            state.user = { name, age, grade, country, city };
+            state.questions = questionsPool[grade] || questionsPool["10-11"];
+            state.qIndex = 0;
+            state.answers = [];
+            nav('screen-3');
+            askQuestion();
+        }
+
+        function askQuestion() {
+            if (state.qIndex >= state.questions.length) {
+                localStorage.setItem('bagdar_user', JSON.stringify(state.user));
+                document.getElementById('dash-greeting').innerText = state.user.name;
+                initDashboard();
+                nav('screen-4');
+                return;
+            }
+            
+            let q = state.questions[state.qIndex];
+            let qDiv = document.getElementById('sq-question');
+            let aDiv = document.getElementById('sq-answers');
+            
+            // Progress
+            let pct = (state.qIndex / state.questions.length) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+
+            aDiv.innerHTML = '';
+            qDiv.innerText = '';
+            
+            // Typing effect
+            let i = 0;
+            let txt = q.q;
+            function type() {
+                if(i < txt.length) { qDiv.innerHTML += txt.charAt(i); i++; setTimeout(type, 50); }
+                else { showAnswers(q.a); }
+            }
+            type();
+        }
+
+        function showAnswers(ansArray) {
+            let aDiv = document.getElementById('sq-answers');
+            ansArray.forEach((a, idx) => {
+                let btn = document.createElement('button');
+                btn.className = 'answer-btn';
+                btn.innerText = a;
+                btn.style.opacity = '0';
+                btn.onclick = () => {  state.answers.push(a); state.qIndex++; askQuestion(); };
+                aDiv.appendChild(btn);
+                setTimeout(() => { btn.style.opacity = '1'; }, idx * 100);
+            });
+        }
+
+        function resetApp() {
+            localStorage.removeItem('bagdar_user');
+            location.reload();
+        }
+
+        function switchTab(tId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            document.getElementById(tId).classList.add('active');
+            let btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tId));
+            if(btn) btn.classList.add('active');
+        }
+
+        function initDashboard() {
+            renderPath();
+            renderUniversities();
+            renderScholarships();
+            renderExams();
+            renderInternships();
+        }
+
+        function renderPath() {
+            // Suggest careers based on random mix just for simulation offline
+            let shuffled = careersData.sort(() => 0.5 - Math.random());
+            let top3 = shuffled.slice(0, 3);
+            let html = '';
+            top3.forEach(c => {
+                html += `<div class="card">
+                    <h3>${c.title}</h3>
+                    <p>${c.desc}</p>
+                    <p>💰 ${c.salary}</p>
+                    <p>🔥 Demand: ${c.demand}</p>
+                    <p>🛠 ${c.skills.split(',').map(s => `<span class="tag">${s}</span>`).join('')}</p>
+                </div>`;
+            });
+            document.getElementById('path-careers').innerHTML = html;
+
+            let plan = "";
+            let g = state.user.grade;
+            if(g==="1-4") plan = "1. Join school clubs.<br>2. Start a hobby journal.<br>3. Explore different activities with parents.";
+            else if(g==="5-6") plan = "1. Try Khan Academy.<br>2. Join local olympiads.<br>3. Find out what subjects you really love.";
+            else if(g==="7-8") plan = "1. Start your first coding/science/art project.<br>2. Join competitions.<br>3. Find online mentors.";
+            else if(g==="9") plan = "1. Choose profile direction (Science vs Arts).<br>2. Research top universities.<br>3. Start preparing for IELTS.";
+            else if(g==="10-11") plan = "1. Full IELTS preparation.<br>2. Create Portfolio.<br>3. Track application deadlines.<br>4. Apply for Grants!";
+            else plan = "1. Optimize LinkedIn profile.<br>2. Apply for 10+ Internships.<br>3. Build industry skills.";
+            
+            document.getElementById('path-action-plan').innerHTML = `<p style="text-align:left; color:white; font-size:1.1rem; line-height:1.8;">${plan}</p>`;
+        }
+
+        function renderUniversities() {
+            let q = document.getElementById('filter-uni-search').value.toLowerCase();
+            let c = document.getElementById('filter-uni-country').value;
+            let filtered = universitiesData.filter(u => 
+                (u.n.toLowerCase().includes(q) || u.p.toLowerCase().includes(q)) &&
+                (c === "" || u.c === c)
+            );
+            
+            let html = '';
+            filtered.forEach(u => {
+                html += `<div class="card">
+                    <h3>${u.n} <span>[QS: #${u.r}]</span></h3>
+                    <p>🌍 ${u.c}</p>
+                    <p>💲 Tuition: ${u.t}</p>
+                    <p>📈 Accept Rate: ${u.a}</p>
+                    <p>🏆 Top: ${u.p}</p>
+                    <p>⏰ Deadline: ${u.d}</p>
+                    <a href="${u.u}" target="_blank">Official Website →</a>
+                </div>`;
+            });
+            document.getElementById('uni-grid').innerHTML = html;
+        }
+
+        function renderScholarships() {
+            let q = document.getElementById('filter-schol-search').value.toLowerCase();
+            let filtered = scholarshipsData.filter(s => s.n.toLowerCase().includes(q) || s.c.toLowerCase().includes(q));
+            let html = '';
+            filtered.forEach(s => {
+                html += `<div class="card">
+                    <h3>${s.n}</h3>
+                    <p>📍 ${s.c} | 🎓 ${s.l}</p>
+                    <p>${s.d}</p>
+                    <p>⏰ Deadline: ${s.k}</p>
+                    <a href="${s.u}" target="_blank">Details →</a>
+                </div>`;
+            });
+            document.getElementById('schol-grid').innerHTML = html;
+        }
+
+        function renderExams() {
+            let html = '';
+            examsData.forEach(e => {
+                html += `<div class="card">
+                    <h3>${e.t}</h3>
+                    <p>${e.b}</p>
+                    <p><strong>Resources:</strong><br> ${e.l.map(r=>`<span class="tag">${r}</span>`).join('')}</p>
+                </div>`;
+            });
+            document.getElementById('exams-grid').innerHTML = html;
+        }
+
+        function renderInternships() {
+            let html = '';
+            internshipsLinks.forEach(i => {
+                html += `<a href="${i.u}" target="_blank" style="padding:10px; background:var(--surface); border:1px solid var(--border); border-radius:8px; display:inline-flex; align-items:center; gap:10px; text-decoration:none; color:white; min-width:200px;">🔗 ${i.n}</a>`;
+            });
+            document.getElementById('intern-links').innerHTML = html;
+        }
+
+        function generateItem(type) {
+            let out = document.getElementById('generated-outputs');
+            let today = new Date().toLocaleDateString();
+            if(type === 'cv') {
+                let e = document.getElementById('cv-edu').value || "BSc Computer Science";
+                let s = document.getElementById('cv-skills').value || "Python, React, Design";
+                out.innerHTML = `<div class="card" style="border-color:var(--purple);"><h2 style="text-align:center;">${state.user.name}</h2><p style="text-align:center;">${state.user.city}, ${state.user.country} • ${state.user.grade}</p><hr style="border:0; border-top:1px solid var(--border); margin:15px 0;"><h3 style="margin-bottom:10px;">Education</h3><p>${e}</p><h3 style="margin:top:15px; margin-bottom:10px;">Skills</h3><p>${s.split(',').map(x=>`<span class="tag">${x.trim()}</span>`).join('')}</p></div>`;
+            } else {
+                let r = document.getElementById('cl-role').value || "Intern";
+                let c = document.getElementById('cl-comp').value || "Google";
+                out.innerHTML = `<div class="card" style="border-color:var(--blue);"><p>Dear Hiring Manager at ${c},</p><br><p>I am writing to express my profound interest in the ${r} position. As a student in ${state.user.grade} from ${state.user.country}, I am passionate about creating value and learning rapidly. With my background and strong foundational skills, I believe I will be a great addition to your team at ${c}.</p><br><p>Sincerely,<br>${state.user.name}</p></div>`;
+            }
+        }
+
+        function generatePortfolio() {
+            let s = document.getElementById('pf-school').value || "My School";
+            let a = document.getElementById('pf-achive').value || "Olympiad Winner";
+            let l = document.getElementById('pf-lang').value || "English, Local";
+            let p = document.getElementById('pf-projects').value || "Volunteer at NGO";
+            let g = document.getElementById('pf-goal').value || "Change the world";
+            
+            document.getElementById('portfolio-output').innerHTML = `
+                <div class="card" style="background: linear-gradient(to bottom right, #111, #1a1a2e); border: 2px solid var(--purple); box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);">
+                    <div style="text-align:center; padding:20px;">
+                        <h1 style="font-size:2.5rem; margin-bottom:5px;">${state.user.name}</h1>
+                        <p style="color:var(--purple); font-weight:bold;">${s} • ${state.user.country}</p>
+                    </div>
+                    <div style="padding:20px;">
+                        <h3 style="border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:10px;">Goal</h3>
+                        <p>${g}</p>
+                        <h3 style="border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:10px; margin-top:20px;">Achievements</h3>
+                        <p>${a.split(',').map(x=>`<span class="tag" style="background:rgba(139, 92, 246, 0.2);">${x.trim()}</span>`).join('')}</p>
+                        <h3 style="border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:10px; margin-top:20px;">Projects & Volunteering</h3>
+                        <p>${p}</p>
+                        <h3 style="border-bottom:1px solid var(--border); padding-bottom:5px; margin-bottom:10px; margin-top:20px;">Languages</h3>
+                        <p>${l}</p>
+                    </div>
+                    <button style="margin:20px; width:calc(100% - 40px);" onclick="window.print()">Print Portfolio</button>
+                </div>
+            `;
+        }
+
+        // --- Chat logic ---
+        function handleChatPress(e) { if(e.key === 'Enter') sendChat(); }
+        function sendChatFromChip(txt) { document.getElementById('chat-input').value = txt; sendChat(); }
+        
+        function sendChat() {
+            let input = document.getElementById('chat-input');
+            let txt = input.value.trim();
+            if(!txt) return;
+            
+            appendChat(txt, 'chat-user');
+            input.value = '';
+            
+            setTimeout(() => {
+                let resp = getAIResponse(txt.toLowerCase());
+                appendChat(resp, 'chat-bot');
+            }, 600);
+        }
+
+        function appendChat(txt, cls) {
+            let c = document.getElementById('chat-messages');
+            let div = document.createElement('div');
+            div.className = `chat-bubble ${cls}`;
+            // Allow basic html parsing for breaks
+            div.innerHTML = txt.replace(/\n/g, '<br>');
+            c.appendChild(div);
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function getAIResponse(q) {
+            if(q.includes('change the world')) return "🌍 \"When something is important enough, you do it even if the odds are not in your favor.\" - Elon Musk. You have the power to shape the future!";
+            if(q.includes('mit')) return "MIT (Massachusetts Institute of Technology) is in the USA. Tuition is ~$57k. Acceptance rate is ~4.8%. Need high SAT & TOEFL/IELTS. Check the Universities tab!";
+            if(q.includes('oxford')) return "Oxford is in the UK. Requires UCAS application, high grades (A-levels or IB), and often an interview. Check the admission test requirements!";
+            if(q.includes('chevening')) return "Chevening is the UK government’s global scholarship programme. It offers fully-funded master's degrees for future leaders. Apply mostly in November!";
+            if(q.includes('fulbright')) return "Fulbright is a USA program offering full funding for Masters/PhD. Requires strong academic record and leadership potential.";
+            if(q.includes('ielts')) return "IELTS requires mostly a 7.0 for top universities. Practice past papers on British Council website. Don't forget to practice speaking with a timer!";
+            if(q.includes('sat')) return "SAT is crucial for US universities. Aim for 1450+ for Top 50. Use Khan Academy - it's free and personalized!";
+            if(q.includes('harvard') || q.includes('stanford')) return "A top US Ivy/Elite institution! You will need a near-perfect GPA, a high SAT, and outstanding extracurriculars. Start building your portfolio!";
+            if(q.includes('internship') || q.includes('cv')) return "You can find internships on LinkedIn, Glassdoor, or directly via Google/Microsoft student pipelines. Use my CV Builder in the Internships tab!";
+            if(q.includes('motivation') || q.includes('letter')) return `Dear Admissions,\nMy name is ${state.user.name}. I am from ${state.user.country} and I am determined to excel at your institution. I promise to leverage this opportunity to build a better future.\n(Tip: Make it personal, talk about a project you made!)`;
+            if(q.includes('career') || q.includes('2030')) return "Top careers by 2030: AI Researcher, Cybersecurity Analyst, Data Scientist, Renewable Energy Engineer, Healthcare Professionals.";
+            if(q.includes('hello') || q.includes('hi')) return "Hello there! How can I help you today?";
+            
+            return "I am searching my offline database... Try asking me about 'MIT', 'Chevening', 'IELTS', 'Internships', or asking for a 'motivation letter'!";
+        }
+
+    </script>
+</body>
+</html>
