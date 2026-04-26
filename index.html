@@ -234,40 +234,90 @@
         }
 
         /* Dashboard */
+        /* Dashboard Layout: Tabs on LEFT */
         .dashboard {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1500px;
             margin: 0 auto;
-            padding-top: 60px;
+            padding: 80px 25px 40px 25px;
+            display: flex;
+            flex-direction: row; /* Tabs left, info right */
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .dashboard-main {
+            flex: 1;
+            min-width: 0;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
         }
 
         .tabs {
             display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-            scrollbar-width: thin;
+            flex-direction: column;
+            gap: 15px;
+            width: 280px;
+            position: sticky;
+            top: 100px;
+            padding: 20px;
+            border-radius: 25px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            flex-shrink: 0;
         }
 
         .tab-btn {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            padding: 12px 20px;
-            border-radius: 12px;
-            color: white;
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 16px 22px;
+            border-radius: 15px;
+            color: var(--text-light);
             cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
+            font-size: 1.05rem;
+            width: 100%;
+            justify-content: flex-start;
             font-weight: 600;
-            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: var(--hover);
+            border-color: var(--blue);
+            color: white;
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: white;
+            border: none;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5);
+            transform: scale(1.05);
+        }
+
+        .tab-btn:hover {
+            background: var(--hover);
+            border-color: var(--blue);
+            color: white;
+            transform: translateX(-5px);
         }
 
         .tab-btn.active {
             background: linear-gradient(135deg, var(--purple), var(--blue));
-            border-color: transparent;
+            color: white;
+            border: none;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
 
         .tab-content {
@@ -486,6 +536,125 @@
             }
         }
 
+        /* Career DNA Visualization */
+        .dna-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+        .hex {
+            width: 110px;
+            height: 125px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.1));
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInStagger 0.6s forwards;
+            transition: transform 0.3s, filter 0.3s;
+            text-align: center;
+            padding: 10px;
+        }
+        .hex:hover {
+            transform: translateY(-5px) scale(1.1) !important;
+            filter: brightness(1.3);
+        }
+        @keyframes fadeInStagger {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            margin: 50px 0 30px 0;
+            padding: 0 10px;
+        }
+        .timeline-line {
+            position: absolute;
+            top: 20px;
+            left: 5%;
+            width: 90%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--purple), var(--blue));
+            border-radius: 2px;
+            box-shadow: 0 0 15px var(--purple);
+            z-index: 0;
+        }
+        .timeline-dots {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+        .t-dot-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25%;
+            text-align: center;
+        }
+        .t-dot {
+            width: 18px;
+            height: 18px;
+            background: var(--bg);
+            border: 3px solid var(--blue);
+            border-radius: 50%;
+            margin-bottom: 12px;
+            transition: 0.3s;
+        }
+        .t-dot-wrapper:hover .t-dot {
+            background: var(--purple);
+            transform: scale(1.4);
+            box-shadow: 0 0 15px var(--blue);
+        }
+        .t-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Particles */
+        #particles-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 50%;
+            bottom: -20px;
+            animation: floatUp 10s linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-120vh) scale(1.5); opacity: 0; }
+        }
+
+        body[dir="rtl"] {
+            text-align: right;
+        }
+        body[dir="rtl"] .lang-switcher {
+            right: auto;
+            left: 20px;
+        }
+        body[dir="rtl"] .sidebar {
+            border-left: 1px solid var(--border);
+            border-right: none;
+        }
+
         @media print {
             body {
                 background: white !important;
@@ -544,6 +713,12 @@
         <option value="kk">Қазақша</option>
         <option value="zh">中文</option>
         <option value="tr">Türkçe</option>
+        <option value="ar">العربية</option>
+        <option value="de">Deutsch</option>
+        <option value="hi">हिन्दी</option>
+        <option value="ja">日本語</option>
+        <option value="uk">Українська</option>
+        <option value="pl">Polski</option>
     </select>
 
     <div class="progress-bar" id="pb-container" style="display:none;">
@@ -552,6 +727,28 @@
 
     <!-- Screen 1: Welcome -->
     <div class="screen" id="screen1">
+        <div id="particles-container">
+            <div class="particle" style="left:5%; width:5px; height:5px; animation-delay:0s; animation-duration:8s;"></div>
+            <div class="particle" style="left:15%; width:8px; height:8px; animation-delay:2s; animation-duration:12s;"></div>
+            <div class="particle" style="left:25%; width:4px; height:4px; animation-delay:4s; animation-duration:10s;"></div>
+            <div class="particle" style="left:35%; width:7px; height:7px; animation-delay:1s; animation-duration:9s;"></div>
+            <div class="particle" style="left:45%; width:6px; height:6px; animation-delay:5s; animation-duration:11s;"></div>
+            <div class="particle" style="left:55%; width:9px; height:9px; animation-delay:3s; animation-duration:13s;"></div>
+            <div class="particle" style="left:65%; width:5px; height:5px; animation-delay:6s; animation-duration:7s;"></div>
+            <div class="particle" style="left:75%; width:8px; height:8px; animation-delay:2s; animation-duration:12s;"></div>
+            <div class="particle" style="left:85%; width:4px; height:4px; animation-delay:0s; animation-duration:10s;"></div>
+            <div class="particle" style="left:95%; width:7px; height:7px; animation-delay:4s; animation-duration:9s;"></div>
+            <div class="particle" style="left:10%; width:6px; height:6px; animation-delay:1s; animation-duration:11s;"></div>
+            <div class="particle" style="left:20%; width:9px; height:9px; animation-delay:5s; animation-duration:13s;"></div>
+            <div class="particle" style="left:30%; width:5px; height:5px; animation-delay:3s; animation-duration:7s;"></div>
+            <div class="particle" style="left:40%; width:8px; height:8px; animation-delay:6s; animation-duration:12s;"></div>
+            <div class="particle" style="left:50%; width:4px; height:4px; animation-delay:2s; animation-duration:10s;"></div>
+            <div class="particle" style="left:60%; width:7px; height:7px; animation-delay:0s; animation-duration:9s;"></div>
+            <div class="particle" style="left:70%; width:6px; height:6px; animation-delay:4s; animation-duration:11s;"></div>
+            <div class="particle" style="left:80%; width:9px; height:9px; animation-delay:1s; animation-duration:13s;"></div>
+            <div class="particle" style="left:90%; width:5px; height:5px; animation-delay:5s; animation-duration:7s;"></div>
+            <div class="particle" style="left:50%; width:8px; height:8px; animation-delay:3s; animation-duration:12s;"></div>
+        </div>
         <div class="screen-center">
             <h1 class="logo-main gradient-text">Bagdar AI</h1>
             <p class="subtitle" id="t-sub">Your Personal Life Navigator</p>
@@ -569,8 +766,8 @@
                 <input type="text" id="i-name" class="input-glass" placeholder="John Doe">
             </div>
             <div class="form-group">
-                <label id="t-age">Age</label>
-                <input type="number" id="i-age" class="input-glass" placeholder="15">
+                <label id="t-age">Birth Date</label>
+                <input type="date" id="i-dob" class="input-glass" style="color-scheme: dark;">
             </div>
             <div class="form-group">
                 <label id="t-grade">Grade / Stage</label>
@@ -610,19 +807,21 @@
     <!-- Screen 4: Dashboard -->
     <div class="screen" id="screen4" style="align-items: flex-start;">
         <div class="dashboard">
-            <h2 class="gradient-text" style="margin-bottom: 20px; font-size: 2.5rem;" id="dash-greeting">Welcome!</h2>
-
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('path')">🎯 <span id="t-tab1">My Path</span></button>
                 <button class="tab-btn" onclick="switchTab('unis')">🏫 <span id="t-tab2">Universities</span></button>
-                <button class="tab-btn" onclick="switchTab('scholars')">💰 <span
-                        id="t-tab3">Scholarships</span></button>
+                <button class="tab-btn" onclick="switchTab('scholars')">💰 <span id="t-tab3">Scholarships</span></button>
                 <button class="tab-btn" onclick="switchTab('exams')">📝 <span id="t-tab4">Exam Prep</span></button>
                 <button class="tab-btn" onclick="switchTab('interns')">💼 <span id="t-tab5">Internships</span></button>
                 <button class="tab-btn" onclick="switchTab('chat')">💬 <span id="t-tab6">AI Chat</span></button>
-                <button class="tab-btn" onclick="switchTab('portfolio')">📄 <span id="t-tab7">My
-                        Portfolio</span></button>
+                <button class="tab-btn" onclick="switchTab('portfolio')">📄 <span id="t-tab7">My Portfolio</span></button>
+                <button class="tab-btn" onclick="switchTab('vision')" style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.4)); border-color: var(--purple);">🔮 <span id="t-tab8">Future Vision</span></button>
             </div>
+
+            <div class="dashboard-main">
+                <h2 class="gradient-text" style="margin-bottom: 30px; font-size: 2.8rem;" id="dash-greeting">Welcome!</h2>
+                
+                <!-- Tab contents will move inside here -->
 
             <!-- Tab 1: Path -->
             <div id="tab-path" class="tab-content active">
@@ -787,6 +986,27 @@
                 <div id="print-area" class="print-card"></div>
             </div>
 
+            <!-- Tab 8: Future Vision -->
+            <div id="tab-vision" class="tab-content">
+                <div style="text-align:center; max-width: 800px; margin: 0 auto;">
+                    <h2 class="gradient-text" style="font-size: 2.5rem; margin-bottom: 10px;">Visualize Your Future</h2>
+                    <p style="color:var(--text-light); margin-bottom: 30px;">Using advanced AI, we will generate a photorealistic vision of your future life and career based on your personal profile.</p>
+                    <button class="btn" onclick="generateVision()" style="background: linear-gradient(135deg, var(--purple), var(--blue)); font-size: 1.2rem; padding: 15px 40px; margin-bottom: 30px; width: 100%; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);">✨ Generate My Future AI Vision</button>
+                    
+                    <div id="vision-result" style="display:none; background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
+                        <h3 id="vision-title" style="color: white; margin-bottom: 15px; font-size: 1.5rem;"></h3>
+                        <div style="position: relative; width: 100%; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.5); background: #000; min-height: 200px;">
+                            <img id="vision-img" style="width: 100%; height: auto; display: block; opacity: 0; transition: opacity 1s;" src="" alt="Future Vision" onload="this.style.opacity=1; document.getElementById('vision-loading').style.display='none';">
+                            <div id="vision-loading" style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; flex-direction:column; color:white;">
+                                <div style="font-size: 3rem;">🔮</div>
+                                <p style="margin-top: 10px;">AI is visualizing your future...</p>
+                            </div>
+                        </div>
+                        <p id="vision-desc" style="margin-top: 20px; font-size: 1.1rem; line-height: 1.6; color: var(--text-light);"></p>
+                    </div>
+                </div>
+            </div>
+            </div>
         </div>
     </div>
 
@@ -923,26 +1143,26 @@
 
         // 20 Careers
         const careersList = [
-            { n: "Artificial Intelligence Engineer", d: "Build AI systems and models.", s: "$130k", r: "Very High", sk: "Python, Math, ML" },
-            { n: "Data Scientist", d: "Analyze data to make business decisions.", s: "$120k", r: "Very High", sk: "Stats, Python, SQL" },
-            { n: "Software Developer", d: "Create applications and systems.", s: "$110k", r: "High", sk: "Coding, Logic" },
-            { n: "Cybersecurity Analyst", d: "Protect networks from attacks.", s: "$105k", r: "Very High", sk: "Networking, Linux, Security" },
-            { n: "Cloud Architect", d: "Design cloud infrastructure.", s: "$140k", r: "High", sk: "AWS, Azure, Networking" },
-            { n: "Robotics Engineer", d: "Design and build robots.", s: "$100k", r: "High", sk: "C++, Mechanics" },
-            { n: "Blockchain Developer", d: "Build decentralized apps.", s: "$120k", r: "Medium", sk: "Cryptography, Solidity" },
-            { n: "UX/UI Designer", d: "Design user interfaces and experiences.", s: "$90k", r: "High", sk: "Figma, Psychology" },
-            { n: "Product Manager", d: "Lead product development.", s: "$115k", r: "High", sk: "Leadership, Agile" },
-            { n: "Digital Marketer", d: "Promote products online.", s: "$70k", r: "High", sk: "SEO, Analytics" },
-            { n: "Financial Analyst", d: "Analyze financial data.", s: "$85k", r: "Medium", sk: "Excel, Economics" },
-            { n: "Investment Banker", d: "Raise capital for companies.", s: "$150k", r: "High", sk: "Finance, Modeling" },
-            { n: "Surgeon", d: "Perform medical operations.", s: "$300k", r: "High", sk: "Anatomy, Precision" },
-            { n: "Biotechnologist", d: "Use biology for technology.", s: "$90k", r: "High", sk: "Biology, Chemistry" },
-            { n: "Environmental Scientist", d: "Protect the environment.", s: "$75k", r: "High", sk: "Ecology, Research" },
-            { n: "Renewable Energy Engineer", d: "Develop green energy.", s: "$95k", r: "Very High", sk: "Engineering, Physics" },
-            { n: "Corporate Lawyer", d: "Handle legal business matters.", s: "$125k", r: "Medium", sk: "Law, Negotiation" },
-            { n: "Architect", d: "Design buildings.", s: "$85k", r: "Medium", sk: "CAD, Design" },
-            { n: "Psychologist", d: "Study human behavior.", s: "$80k", r: "High", sk: "Empathy, Analysis" },
-            { n: "Aerospace Engineer", d: "Design aircraft and spacecraft.", s: "$115k", r: "High", sk: "Physics, Math" }
+            { n: "Artificial Intelligence Engineer", d: "Build AI systems and models.", s: "$130k", r: "Very High", sk: "Python, Math, ML", dims: { t: 5, c: 1, s: 0, a: 5, l: 1 } },
+            { n: "Data Scientist", d: "Analyze data to make business decisions.", s: "$120k", r: "Very High", sk: "Stats, Python, SQL", dims: { t: 4, c: 1, s: 1, a: 5, l: 1 } },
+            { n: "Software Developer", d: "Create applications and systems.", s: "$110k", r: "High", sk: "Coding, Logic", dims: { t: 5, c: 2, s: 1, a: 4, l: 1 } },
+            { n: "Cybersecurity Analyst", d: "Protect networks from attacks.", s: "$105k", r: "Very High", sk: "Networking, Linux, Security", dims: { t: 5, c: 0, s: 1, a: 4, l: 1 } },
+            { n: "Cloud Architect", d: "Design cloud infrastructure.", s: "$140k", r: "High", sk: "AWS, Azure, Networking", dims: { t: 5, c: 1, s: 1, a: 3, l: 2 } },
+            { n: "Robotics Engineer", d: "Design and build robots.", s: "$100k", r: "High", sk: "C++, Mechanics", dims: { t: 5, c: 2, s: 0, a: 4, l: 1 } },
+            { n: "Blockchain Developer", d: "Build decentralized apps.", s: "$120k", r: "Medium", sk: "Cryptography, Solidity", dims: { t: 5, c: 1, s: 0, a: 4, l: 1 } },
+            { n: "UX/UI Designer", d: "Design user interfaces and experiences.", s: "$90k", r: "High", sk: "Figma, Psychology", dims: { t: 2, c: 5, s: 3, a: 2, l: 1 } },
+            { n: "Product Manager", d: "Lead product development.", s: "$115k", r: "High", sk: "Leadership, Agile", dims: { t: 2, c: 2, s: 4, a: 3, l: 5 } },
+            { n: "Digital Marketer", d: "Promote products online.", s: "$70k", r: "High", sk: "SEO, Analytics", dims: { t: 2, c: 4, s: 3, a: 3, l: 1 } },
+            { n: "Financial Analyst", d: "Analyze financial data.", s: "$85k", r: "Medium", sk: "Excel, Economics", dims: { t: 1, c: 0, s: 1, a: 5, l: 2 } },
+            { n: "Investment Banker", d: "Raise capital for companies.", s: "$150k", r: "High", sk: "Finance, Modeling", dims: { t: 1, c: 1, s: 3, a: 5, l: 3 } },
+            { n: "Surgeon", d: "Perform medical operations.", s: "$300k", r: "High", sk: "Anatomy, Precision", dims: { t: 2, c: 1, s: 3, a: 4, l: 2 } },
+            { n: "Biotechnologist", d: "Use biology for technology.", s: "$90k", r: "High", sk: "Biology, Chemistry", dims: { t: 3, c: 1, s: 1, a: 5, l: 1 } },
+            { n: "Environmental Scientist", d: "Protect the environment.", s: "$75k", r: "High", sk: "Ecology, Research", dims: { t: 2, c: 1, s: 2, a: 4, l: 1 } },
+            { n: "Renewable Energy Engineer", d: "Develop green energy.", s: "$95k", r: "Very High", sk: "Engineering, Physics", dims: { t: 4, c: 2, s: 1, a: 4, l: 1 } },
+            { n: "Corporate Lawyer", d: "Handle legal business matters.", s: "$125k", r: "Medium", sk: "Law, Negotiation", dims: { t: 0, c: 1, s: 4, a: 5, l: 3 } },
+            { n: "Architect", d: "Design buildings.", s: "$85k", r: "Medium", sk: "CAD, Design", dims: { t: 2, c: 5, s: 2, a: 3, l: 1 } },
+            { n: "Psychologist", d: "Study human behavior.", s: "$80k", r: "High", sk: "Empathy, Analysis", dims: { t: 0, c: 1, s: 5, a: 4, l: 1 } },
+            { n: "Aerospace Engineer", d: "Design aircraft and spacecraft.", s: "$115k", r: "High", sk: "Physics, Math", dims: { t: 4, c: 2, s: 0, a: 5, l: 1 } }
         ];
 
         // i18n
@@ -950,37 +1170,67 @@
             en: {
                 sub: "Your Personal Life Navigator", start: "Start My Journey",
                 infoTitle: "Tell us about yourself", n: "Full Name", a: "Age", g: "Grade / Stage", c: "Country", cont: "Continue",
-                t1: "My Path", t2: "Universities", t3: "Scholarships", t4: "Exam Prep", t5: "Internships", t6: "AI Chat", t7: "Portfolio"
+                t1: "My Path", t2: "Universities", t3: "Scholarships", t4: "Exam Prep", t5: "Internships", t6: "AI Chat", t7: "Portfolio", t8: "Future Vision"
             },
             es: {
                 sub: "Tu Navegador de Vida Personal", start: "Comenzar mi Viaje",
                 infoTitle: "Cuéntanos sobre ti", n: "Nombre Completo", a: "Edad", g: "Grado / Etapa", c: "País", cont: "Continuar",
-                t1: "Mi Camino", t2: "Universidades", t3: "Becas", t4: "Exámenes", t5: "Prácticas", t6: "Chat de IA", t7: "Portafolio"
+                t1: "Mi Camino", t2: "Universidades", t3: "Becas", t4: "Exámenes", t5: "Prácticas", t6: "Chat de IA", t7: "Portafolio", t8: "Visión del Futuro"
             },
             fr: {
                 sub: "Votre Navigateur de Vie Personnel", start: "Commencer mon Voyage",
                 infoTitle: "Parlez-nous de vous", n: "Nom Complet", a: "Âge", g: "Niveau / Étape", c: "Pays", cont: "Continuer",
-                t1: "Mon Chemin", t2: "Universités", t3: "Bourses", t4: "Examens", t5: "Stages", t6: "Chat IA", t7: "Portfolio"
+                t1: "Mon Chemin", t2: "Universités", t3: "Bourses", t4: "Examens", t5: "Stages", t6: "Chat IA", t7: "Portfolio", t8: "Vision du Futur"
             },
             ru: {
                 sub: "Твой личный навигатор по жизни", start: "Начать путь",
                 infoTitle: "Расскажи о себе", n: "ФИО", a: "Возраст", g: "Класс / Статус", c: "Страна", cont: "Продолжить",
-                t1: "Мой путь", t2: "ВУЗы", t3: "Стипендии", t4: "Экзамены", t5: "Стажировки", t6: "AI Чат", t7: "Портфолио"
+                t1: "Мой путь", t2: "ВУЗы", t3: "Стипендии", t4: "Экзамены", t5: "Стажировки", t6: "AI Чат", t7: "Портфолио", t8: "Видение Будущего"
             },
             kk: {
                 sub: "Сенің жеке өмірлік навигаторың", start: "Жолды бастау",
                 infoTitle: "Өзің туралы айтып бер", n: "Толық аты-жөні", a: "Жасы", g: "Сынып / Статус", c: "Ел", cont: "Жалғастыру",
-                t1: "Менің жолым", t2: "Университеттер", t3: "Стипендиялар", t4: "Емтихандар", t5: "Тағылымдама", t6: "AI Чат", t7: "Портфолио"
+                t1: "Менің жолым", t2: "Университеттер", t3: "Стипендиялар", t4: "Емтихандар", t5: "Тағылымдама", t6: "AI Чат", t7: "Портфолио", t8: "Болашақ Көрінісі"
             },
             zh: {
                 sub: "您的个人生活导航", start: "开始我的旅程",
                 infoTitle: "请介绍一下您自己", n: "全名", a: "年龄", g: "年级 / 阶段", c: "国家", cont: "继续",
-                t1: "我的路径", t2: "大学", t3: "奖学金", t4: "考试准备", t5: "实习", t6: "AI 聊天", t7: "作品集"
+                t1: "我的路径", t2: "大学", t3: "奖学金", t4: "考试准备", t5: "实习", t6: "AI 聊天", t7: "作品集", t8: "未来愿景"
             },
             tr: {
                 sub: "Kişisel Yaşam Navigatörünüz", start: "Yolculuğuma Başla",
                 infoTitle: "Bize kendinizden bahsedin", n: "Ad Soyad", a: "Yaş", g: "Sınıf / Aşama", c: "Ülke", cont: "Devam Et",
-                t1: "Yolum", t2: "Üniversiteler", t3: "Burslar", t4: "Sınavlar", t5: "Stajlar", t6: "Yapay Zeka Sohbet", t7: "Portfolyo"
+                t1: "Yolum", t2: "Üniversiteler", t3: "Burslar", t4: "Sınavlar", t5: "Stajlar", t6: "Yapay Zeka Sohbet", t7: "Portfolyo", t8: "Gelecek Vizyonu"
+            },
+            ar: {
+                sub: "مرشد حياتك الشخصي", start: "ابدأ رحلتي",
+                infoTitle: "أخبرنا عن نفسك", n: "الاسم الكامل", a: "العمر", g: "الصف / المرحلة", c: "الدولة", cont: "متابعة",
+                t1: "مساري", t2: "الجامعات", t3: "المنح الدراسية", t4: "التحضير للاختبارات", t5: "التдريب العملي", t6: "دردشة الذكاء الاصطناعي", t7: "ملف الأعمال", t8: "رؤية المستقبل"
+            },
+            de: {
+                sub: "Ihr persönlicher Lebensnavigator", start: "Meine Reise beginnen",
+                infoTitle: "Erzählen Sie uns von sich", n: "Vollständiger Name", a: "Alter", g: "Klasse / Stufe", c: "Land", cont: "Weiter",
+                t1: "Mein Weg", t2: "Universitäten", t3: "Stipendien", t4: "Prüfungsvorbereitung", t5: "Praktika", t6: "KI-Chat", t7: "Portfolio", t8: "Zukunftsvision"
+            },
+            hi: {
+                sub: "आपका व्यक्तिगत जीवन नेвигеटर", start: "मेरी यात्रा शुरू करें",
+                infoTitle: "अपने बारे में हमें बताएं", n: "पूरा नाम", a: "आयु", g: "कक्षा / चरण", c: "देश", cont: "जारी रखें",
+                t1: "मेरा रास्ता", t2: "विश्वविद्यालय", t3: "छात्रवृттियां", t4: "परीक्षा की तैयारी", t5: "इंटर्नशिप", t6: "एआई चैट", t7: "पोर्टफोलियो", t8: "भвиष्य की दृष्टि"
+            },
+            ja: {
+                sub: "あなたのパーソナルライフナビゲーター", start: "旅を始める",
+                infoTitle: "自己紹介をお願いします", n: "氏名", a: "年齢", g: "学年 / ステージ", c: "国", cont: "次へ",
+                t1: "私の道", t2: "大学", t3: "奨学金", t4: "試験対策", t5: "インターンシップ", t6: "AIチャット", t7: "ポートフォリオ", t8: "将来の展望"
+            },
+            uk: {
+                sub: "Ваш особистий навігатор життя", start: "Почати мою подорож",
+                infoTitle: "Розкажіть нам про себе", n: "Повне ім'я", a: "Вік", g: "Клас / Етап", c: "Країна", cont: "Продовжити",
+                t1: "Мій шлях", t2: "Університети", t3: "Стипендії", t4: "Підготовка до іспитів", t5: "Стажування", t6: "ШІ-чат", t7: "Портфоліо", t8: "Бачення майбутнього"
+            },
+            pl: {
+                sub: "Twój osobisty nawigator życia", start: "Rozpocznij moją podróż",
+                infoTitle: "Powiedz нам coś o sobie", n: "Pełne imię i nazwisko", a: "Wiek", g: "Klasa / Etap", c: "Kraj", cont: "Kontynuuj",
+                t1: "Moja ścieżka", t2: "Uniwersytety", t3: "Stypendia", t4: "Przyготовление до экзаменов", t5: "Staże", t6: "Czat AI", t7: "Portfolio", t8: "Wizja przyszłości"
             }
         };
 
@@ -1039,6 +1289,7 @@
 
         function changeLang() {
             state.l = document.getElementById('lang').value;
+            document.body.setAttribute('dir', state.l === 'ar' ? 'rtl' : 'ltr');
             const d = dict[state.l];
             document.getElementById('t-sub').innerText = d.sub;
             document.getElementById('t-start').innerText = d.start;
@@ -1048,7 +1299,10 @@
             document.getElementById('t-grade').innerText = d.g;
             document.getElementById('t-country').innerText = d.c;
             document.getElementById('t-cont').innerText = d.cont;
-            for (let i = 1; i <= 7; i++) document.getElementById('t-tab' + i).innerText = d['t' + i];
+            for (let i = 1; i <= 8; i++) {
+                const el = document.getElementById('t-tab' + i);
+                if(el) el.innerText = d['t' + i];
+            }
         }
 
         function gotoScreen(n) {
@@ -1058,7 +1312,19 @@
 
         function startQuestions() {
             state.n = document.getElementById('i-name').value || 'Friend';
+            const dob = document.getElementById('i-dob').value;
+            if (dob) {
+                const birthDate = new Date(dob);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const m = today.getMonth() - birthDate.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+                state.a = age;
+            } else {
+                state.a = 15;
+            }
             state.g = document.getElementById('i-grade').value;
+            state.c = document.getElementById('i-country').value;
             state.qsArr = qs[state.g] || qs["10-11"];
             state.qIdx = 0;
             state.answers = [];
@@ -1133,32 +1399,27 @@
             gotoScreen(4);
             document.getElementById('dash-greeting').innerText = `Welcome, ${state.n}!`;
 
+            // Calculate User Profile Dimensions
+            let userProfile = { t: 0, c: 0, s: 0, a: 0, l: 0 };
+            let ansString = state.answers.join(" ").toLowerCase();
+
+            if (ansString.includes("building things") || ansString.includes("technology") || ansString.includes("coding") || ansString.includes("it & computer") || ansString.includes("machines") || ansString.includes("stem")) userProfile.t += 5;
+            if (ansString.includes("math") || ansString.includes("logic")) { userProfile.t += 2; userProfile.a += 3; }
+            if (ansString.includes("drawing") || ansString.includes("art") || ansString.includes("designing") || ansString.includes("creative") || ansString.includes("beautiful things")) userProfile.c += 5;
+            if (ansString.includes("understanding others") || ansString.includes("help people") || ansString.includes("health") || ansString.includes("social injustice") || ansString.includes("people") || ansString.includes("collaborating") || ansString.includes("empathy")) userProfile.s += 5;
+            if (ansString.includes("science") || ansString.includes("analyze") || ansString.includes("research") || ansString.includes("physics")) userProfile.a += 5;
+            if (ansString.includes("leading") || ansString.includes("business") || ansString.includes("management") || ansString.includes("organizations") || ansString.includes("finance")) userProfile.l += 5;
+
             // Render Path - Dynamic Career Suggestions
             const pGrid = document.getElementById('path-careers');
             pGrid.innerHTML = '';
             
             let scoredCareers = careersList.map(c => {
-                let score = 0;
-                let ansString = state.answers.join(" ").toLowerCase();
-                
-                // Match logic
-                if (ansString.includes("it & computer") || ansString.includes("stem") || ansString.includes("machines") || ansString.includes("technology") || ansString.includes("coding")) {
-                    if (c.sk.includes("Tech") || c.sk.includes("Python") || c.sk.includes("ML") || c.sk.includes("Coding") || c.sk.includes("Security") || c.sk.includes("AWS") || c.sk.includes("C++") || c.sk.includes("Solidity")) score += 10;
-                }
-                if (ansString.includes("medicine") || ansString.includes("health") || ansString.includes("doctor")) {
-                    if (c.sk.includes("Anatomy") || c.sk.includes("Biology") || c.sk.includes("Chemistry")) score += 10;
-                }
-                if (ansString.includes("business") || ansString.includes("finance") || ansString.includes("economics")) {
-                    if (c.sk.includes("Finance") || c.sk.includes("Economics") || c.sk.includes("Leadership") || c.sk.includes("Agile") || c.sk.includes("Excel")) score += 10;
-                }
-                if (ansString.includes("arts") || ansString.includes("design") || ansString.includes("humanities") || ansString.includes("creating") || ansString.includes("literature") || ansString.includes("drawing")) {
-                    if (c.sk.includes("Figma") || c.sk.includes("Design") || c.sk.includes("Psychology") || c.sk.includes("CAD") || c.sk.includes("SEO")) score += 10;
-                }
-                if (ansString.includes("science") || ansString.includes("physics") || ansString.includes("nature") || ansString.includes("biology") || ansString.includes("stem")) {
-                    if (c.sk.includes("Physics") || c.sk.includes("Ecology") || c.sk.includes("Stats") || c.sk.includes("Research") || c.sk.includes("Math")) score += 10;
-                }
-                
-                return { ...c, score: score };
+                let score = (userProfile.t * c.dims.t) + (userProfile.c * c.dims.c) + (userProfile.s * c.dims.s) + (userProfile.a * c.dims.a) + (userProfile.l * c.dims.l);
+                let maxPossible = (10 * c.dims.t) + (10 * c.dims.c) + (10 * c.dims.s) + (10 * c.dims.a) + (10 * c.dims.l) || 1;
+                let matchPct = Math.min(Math.round((score / maxPossible) * 100 * 2), 99);
+                if (state.answers.length === 0) { score = 0; matchPct = 0; }
+                return { ...c, score: score, matchPct: matchPct };
             });
             
             if (state.answers.length > 0) {
@@ -1166,28 +1427,158 @@
             }
 
             scoredCareers.slice(0, 3).forEach(c => {
-                pGrid.innerHTML += `<div class="card">
-                    <h3>${c.n}</h3>
-                    <p>${c.d}</p>
-                    <p><strong>Salary:</strong> ${c.s}</p>
-                    <p><strong>Demand:</strong> ${c.r}</p>
-                    <div style="margin-top:10px;"><span class="tag">${c.sk}</span></div>
-                    ${state.answers.length > 0 && c.score > 0 ? `<div style="margin-top:10px; color:var(--purple); font-size:0.9rem;">⭐ Top Match based on your answers</div>` : ''}
+                let topDimName = "Analytical";
+                let maxD = Math.max(c.dims.t, c.dims.c, c.dims.s, c.dims.a, c.dims.l);
+                if(maxD === c.dims.t) topDimName = "Tech";
+                else if(maxD === c.dims.c) topDimName = "Creative";
+                else if(maxD === c.dims.s) topDimName = "Social";
+                else if(maxD === c.dims.l) topDimName = "Leadership";
+
+                let whyString = state.answers.length > 0 ? `Your ${topDimName} profile aligns with the core complexities of this role.` : `A high-impact field for the future.`;
+
+                let careerRecUni = unis.find(u => u.p.toLowerCase().includes(c.n.split(' ')[0].toLowerCase())) || unis[Math.floor(Math.random()*unis.length)];
+                
+                let step1 = "Master Fundamentals (Coursera/EDX)";
+                let step2 = `Build a ${c.sk.split(',')[0]} project`;
+                let step3 = `Target ${careerRecUni.n}`;
+
+                if(state.g === '10-11' || state.g === '9') {
+                    step1 = `Target IELTS 7.0+ for ${careerRecUni.c}`;
+                    step2 = `Participate in ${topDimName} Olympiads`;
+                }
+
+                pGrid.innerHTML += `
+                <div class="card" style="position:relative; overflow:hidden; border-top: 4px solid var(--blue); background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0));">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px;">
+                        <div>
+                            <h3 style="margin:0; font-size:1.6rem; color:white;">${c.n}</h3>
+                            <p style="color:var(--text-light); font-size:0.9rem; margin-top:5px;">${c.d}</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:1.6rem; font-weight:bold; color:var(--blue); text-shadow: 0 0 10px rgba(59,130,246,0.3);">${c.matchPct}%</div>
+                            <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-light);">Match Score</div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:20px;">
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size:0.75rem; color:var(--text-light); margin-bottom:4px;">💰 Est. Salary</div>
+                            <div style="font-size:1rem; font-weight:bold;">${c.s} <span style="font-size:0.7rem; font-weight:normal; color:#10b981;">↑ 12%</span></div>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                            <div style="font-size:0.75rem; color:var(--text-light); margin-bottom:4px;">📈 Demand</div>
+                            <div style="font-size:1rem; font-weight:bold;">${c.r}</div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 12px; margin-bottom:20px; border-left: 4px solid var(--blue);">
+                        <p style="margin:0; font-size:0.9rem; line-height:1.4;"><strong>💡 Insight:</strong> ${whyString}</p>
+                    </div>
+
+                    <div style="margin-bottom:20px;">
+                        <p style="font-size:0.85rem; font-weight:bold; margin-bottom:10px; color:var(--text-light);">🚀 Your Success Roadmap:</p>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <div style="display:flex; align-items:center; gap:10px; font-size:0.85rem;">
+                                <div style="width:18px; height:18px; background:var(--blue); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;">1</div>
+                                <span>${step1}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:0.85rem;">
+                                <div style="width:18px; height:18px; background:var(--purple); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;">2</div>
+                                <span>${step2}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; font-size:0.85rem;">
+                                <div style="width:18px; height:18px; background:#10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px;">3</div>
+                                <span>${step3}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; gap:10px; border-top:1px solid var(--border); padding-top:15px;">
+                        <button class="btn" style="flex:1; font-size:0.8rem; padding:10px;" onclick="switchTab('unis'); document.getElementById('uni-search').value='${careerRecUni.n}'; renderUnis();">🔍 Target Uni</button>
+                        <button class="btn" style="flex:1; font-size:0.8rem; padding:10px; background:rgba(255,255,255,0.1);" onclick="switchTab('chat');">🤖 Ask AI</button>
+                    </div>
                 </div>`;
             });
 
+            // Superpower Badge
+            let dimsArr = [
+                {n:'Tech', v:userProfile.t}, {n:'Creative', v:userProfile.c}, 
+                {n:'Social', v:userProfile.s}, {n:'Analytical', v:userProfile.a}, 
+                {n:'Leadership', v:userProfile.l}
+            ].sort((a,b)=>b.v-a.v);
+            let superpower = state.answers.length > 0 ? `⚡ Your superpower: ${dimsArr[0].n} + ${dimsArr[1].n}` : `⚡ Explore to find your superpower!`;
+
             const plan = document.getElementById('path-plan');
-            let profileSum = `<div class="card" style="border-left: 5px solid var(--purple); background: var(--glass); margin-bottom: 20px;">
-                <h3 style="margin-top:0;">Your Profile Summary 🎯</h3>
-                <p><strong>Name:</strong> ${state.n}</p>
-                <p><strong>Stage:</strong> Grade ${state.g} (${state.c})</p>
-                <p><strong>Top Interests:</strong> ${state.answers.length > 0 ? state.answers.slice(0, 2).join(', ') : 'Not yet defined'}</p>
-                <p><strong>Recommended Focus:</strong> Based on your profile, we recommend exploring <strong>${scoredCareers[0]?.n || 'your interests'}</strong>.</p>
+            let profileSum = `<div class="card" style="border-left: 5px solid var(--purple); background: var(--glass); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                <h3 style="margin-top:0; font-size:1.8rem;">Your Profile Summary 🎯</h3>
+                <p style="font-size:1.1rem;"><strong>Name:</strong> ${state.n}</p>
+                <p style="font-size:1.1rem;"><strong>Age:</strong> ${state.a} years old (${state.c})</p>
+                <div style="margin-top:15px; display:inline-block; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2)); border: 1px solid var(--purple); padding: 8px 20px; border-radius: 25px; font-weight: bold; font-size: 1rem; color: #fff; box-shadow: 0 0 15px rgba(139,92,246,0.3);">${superpower}</div>
             </div>`;
 
-            if (state.g === '1-4' || state.g === '5-6') plan.innerHTML = profileSum + "<h3>Action Plan</h3><ul><li>Explore hobbies</li><li>Join school clubs</li><li>Try Khan Academy</li></ul>";
-            else if (state.g === '10-11') plan.innerHTML = profileSum + "<h3>Roadmap</h3><ul><li>Prepare for IELTS (Target 7.0)</li><li>Build Portfolio</li><li>Research Universities</li><li>Apply for Bolashaq/Grants</li></ul>";
-            else plan.innerHTML = profileSum + "<h3>Action Plan</h3><ul><li>Update LinkedIn</li><li>Learn new skills</li><li>Network</li></ul>";
+            plan.innerHTML = profileSum;
+
+            // Career DNA Visualization
+            let dnaHtml = `<div class="card" style="margin-top: 30px; text-align:center;">
+                <h3 style="font-size: 1.6rem; margin-bottom:10px;">🧬 Your Career DNA</h3>
+                <p style="color:var(--text-light);">Based on your unique psychological profile</p>
+                
+                <div class="dna-grid">`;
+                
+            let dnaTraits = [
+                {n:'Tech', v:userProfile.t, e:'💻', c:'var(--blue)'},
+                {n:'Creative', v:userProfile.c, e:'🎨', c:'#f59e0b'},
+                {n:'Social', v:userProfile.s, e:'🤝', c:'#ec4899'},
+                {n:'Logic', v:userProfile.a, e:'🧠', c:'#10b981'},
+                {n:'Lead', v:userProfile.l, e:'👑', c:'var(--purple)'},
+                {n:'Focus', v:Math.max(1, Math.round((userProfile.t+userProfile.a)/2)), e:'🎯', c:'#06b6d4'}
+            ];
+
+            dnaTraits.forEach((t, i) => {
+                let delay = i * 0.1;
+                let val = state.answers.length > 0 ? (t.v*10) + 10 : 0; // scale for visual
+                if(val > 100) val = 100;
+                dnaHtml += `
+                <div class="hex" style="animation-delay: ${delay}s;">
+                    <div style="font-size:2rem; margin-bottom:5px;">${t.e}</div>
+                    <div style="font-size:0.8rem; font-weight:bold; margin-bottom:5px;">${t.n}</div>
+                    <div style="width:60%; height:4px; background:rgba(255,255,255,0.2); border-radius:2px;">
+                        <div style="width:${val}%; height:100%; background:${t.c}; border-radius:2px;"></div>
+                    </div>
+                </div>`;
+            });
+
+            dnaHtml += `</div>`;
+
+            // Timeline stones based on age
+            let ageNum = parseInt(state.a) || 15;
+            let tStones = ["Learn Basics", "Build Project", "First Job", "Leadership"];
+            if (ageNum <= 12) tStones = ["Find Passion", "Join Clubs", "Olympiads", "Choose Major"];
+            else if (ageNum >= 13 && ageNum <= 15) tStones = ["Master IELTS", "Win Olympiad", "Get Scholarship", "Top Uni"];
+            else if (ageNum >= 16 && ageNum <= 18) tStones = ["IELTS 7.0+", "Apply to Unis", "Freshman Year", "Top Internship"];
+            else if (ageNum > 18 && ageNum <= 23) tStones = ["Internship", "First Job", "Promotion", "Launch Project"];
+            else tStones = ["Upskill", "Side Project", "Promotion", "Leadership Role"];
+
+            dnaHtml += `
+                <div class="timeline-container">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-dots">
+                        <div class="t-dot-wrapper"><div class="t-dot"></div><div class="t-label">2025<br>${tStones[0]}</div></div>
+                        <div class="t-dot-wrapper"><div class="t-dot"></div><div class="t-label">2028<br>${tStones[1]}</div></div>
+                        <div class="t-dot-wrapper"><div class="t-dot"></div><div class="t-label">2030<br>${tStones[2]}</div></div>
+                        <div class="t-dot-wrapper"><div class="t-dot"></div><div class="t-label">2035<br>${tStones[3]}</div></div>
+                    </div>
+                </div>`;
+
+            // Share Button
+            let topCareerName = scoredCareers[0]?.n || 'Future Leader';
+            let shareText = `My Bagdar AI Career DNA: ${dimsArr[0].n} Thinker + ${topCareerName}. Generated at bagdar.ai 🚀`;
+            
+            dnaHtml += `
+                <button class="btn" style="margin-top:20px; background:transparent; border:1px solid var(--purple);" onclick="navigator.clipboard.writeText('${shareText}'); alert('Copied to clipboard!');">📤 Share My Career DNA</button>
+            </div>`;
+
+            plan.innerHTML += dnaHtml;
 
             renderUnis();
             renderScholars();
@@ -1343,7 +1734,19 @@
                 hist.scrollTop = hist.scrollHeight;
                 
                 try {
-                    let promptCtx = `You are Bagdar AI, an expert student navigator. User is ${state.n}, age ${state.a}, from ${state.c}, stage: ${state.g}. Match Score Answers: ${state.answers.join(", ")}. Respond concisely (max 3 sentences) and be extremely helpful.`;
+                    let promptCtx = `Ты — персональный карьерный навигатор для школьников Казахстана. Говори с пользователем на "ты", тепло и по-дружески, как старший товарищ.
+Сегодняшняя дата: 2026-04-26. Пользователь: ${state.n}, возраст: ${state.a}, из: ${state.c}, стадия: ${state.g}.
+
+Когда пользователь даёт тебе дату рождения — рассчитай его точный возраст и сгенерируй его "Career DNA": уникальный карьерный профиль.
+
+СТРУКТУРА ОТВЕТА:
+1. 🧬 ТВОЯ CAREER DNA: Короткое вступление, возраст, стадия жизни.
+2. 💡 ТВОЙ КАРЬЕРНЫЙ ПРОФИЛЬ: Карьерная стадия, сильные стороны по возрасту, главный риск, Топ-3 трека для Казахстана.
+3. 🎯 ЧТО ТЕБЕ ДЕЛАТЬ ПРЯМО СЕЙЧАС: Конкретные шаги под возраст (13-15, 16-17, 18+).
+4. 🗺️ ТВОЙ ROAD MAP: Пошаговый план с ресурсами (тесты: proforientator.ru, postupi.online; гранты: bdk.gov.kz, jasstar.kz, bolashak.gov.kz; курсы: coursera.org, stepik.org; портфолио: hh.kz, linkedin.com; олимпиады: daryn.kz).
+5. 💬 МОТИВАЦИОННЫЙ ФИНАЛ: 2-3 предложения лично.
+
+ПРАВИЛА: Всегда "ты", никаких канцеляризмов, эмодзи только в заголовках.`;
                     
                     if(isInterviewMode) {
                         promptCtx = `You are an Admissions Officer conducting a university interview for ${state.n}. Act like a tough but fair interviewer. Based on their answer: "${txt}", give brief feedback on their answer (max 2 sentences), and then explicitly ask the NEXT interview question to keep the interview going.`;
@@ -1434,6 +1837,44 @@
             `;
             printArea.style.display = 'block';
             printArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Future Vision Feature
+        function generateVision() {
+            const resDiv = document.getElementById('vision-result');
+            const imgEl = document.getElementById('vision-img');
+            const loadEl = document.getElementById('vision-loading');
+            const titleEl = document.getElementById('vision-title');
+            const descEl = document.getElementById('vision-desc');
+
+            resDiv.style.display = 'block';
+            imgEl.style.opacity = '0';
+            loadEl.style.display = 'flex';
+
+            let topCareer = "successful professional";
+            let topUni = "top global university";
+            let ansStr = state.answers.join(" ").toLowerCase();
+
+            if (ansStr.includes("medicine") || ansStr.includes("health")) topCareer = "top surgeon";
+            else if (ansStr.includes("it & computer") || ansStr.includes("coding") || ansStr.includes("tech")) topCareer = "AI Engineer";
+            else if (ansStr.includes("business") || ansStr.includes("finance")) topCareer = "CEO";
+            else if (ansStr.includes("arts") || ansStr.includes("design")) topCareer = "famous creative designer";
+            else if (ansStr.includes("science")) topCareer = "lead research scientist";
+
+            if (ansStr.includes("usa")) topUni = "Stanford University";
+            else if (ansStr.includes("uk") || ansStr.includes("europe")) topUni = "Oxford University";
+            else if (ansStr.includes("asia")) topUni = "National University of Singapore";
+            else topUni = "a beautiful high-tech global campus";
+
+            titleEl.innerText = `${state.n}'s Future in 2035 🌟`;
+            descEl.innerHTML = `Based on your AI profile, we predict you will thrive as a <strong>${topCareer}</strong> at <strong>${topUni}</strong>. Stay focused, keep learning, and this could be your reality!`;
+
+            const prompt = `A highly detailed, cinematic, inspiring photorealistic 8k photo of a successful young ${topCareer} named ${state.n} working happily at ${topUni}, futuristic, highly detailed, beautiful lighting, award winning photography`;
+            const encodedPrompt = encodeURIComponent(prompt);
+            
+            // Generate instantly using Pollinations AI (free, no API key needed)
+            const seed = Math.floor(Math.random() * 100000);
+            imgEl.src = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=450&nologo=true&seed=${seed}`;
         }
 
         // Init
